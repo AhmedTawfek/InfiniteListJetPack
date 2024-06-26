@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
 }
 
@@ -50,6 +51,10 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -82,16 +87,13 @@ dependencies {
     implementation(libs.converter.gson)
 
     // Room
+    api(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    annotationProcessor(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.paging)
 
     // Hilt
-    //implementation(libs.hilt.android)
-    //annotationProcessor(libs.hilt.compiler)
-
-    implementation("com.google.dagger:hilt-android:2.45")
-    annotationProcessor("com.google.dagger:hilt-android-compiler:2.45")
-    annotationProcessor("androidx.hilt:hilt-compiler:1.0.0")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 }

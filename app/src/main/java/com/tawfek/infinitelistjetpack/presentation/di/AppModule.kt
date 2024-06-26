@@ -1,6 +1,7 @@
 package com.tawfek.infinitelistjetpack.presentation.di
 
 import android.content.Context
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -54,6 +55,7 @@ object AppModule{
                 postApi = postsApi
             ),
             pagingSourceFactory = {
+                Log.d("Pagination","pagingSourceFactory Getting data from local.")
                 localDatabase.postDao().getPosts()
             }
         )

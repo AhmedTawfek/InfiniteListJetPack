@@ -1,6 +1,7 @@
 package com.tawfek.infinitelistjetpack.presentation.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -34,6 +35,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val viewModel = hiltViewModel<HomeViewModel>()
                     val posts = viewModel.postsPagerFlow.collectAsLazyPagingItems()
+                    Log.d("Pagination","${posts.itemCount}")
                     HomeScreen(posts = posts)
                 }
             }

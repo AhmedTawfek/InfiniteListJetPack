@@ -1,7 +1,9 @@
 package com.tawfek.infinitelistjetpack.presentation.ui.screen.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.LOG_TAG
 import androidx.paging.Pager
 import androidx.paging.cachedIn
 import androidx.paging.map
@@ -21,5 +23,4 @@ class HomeViewModel @Inject constructor(
             pagingData.map { it.toPost() }
         }
         .cachedIn(viewModelScope)
-
 }

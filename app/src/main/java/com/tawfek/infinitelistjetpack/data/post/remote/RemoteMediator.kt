@@ -9,6 +9,7 @@ import androidx.room.withTransaction
 import com.tawfek.infinitelistjetpack.data.mappers.toPostEntity
 import com.tawfek.infinitelistjetpack.data.post.local.LocalDatabase
 import com.tawfek.infinitelistjetpack.data.post.local.PostEntity
+import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -23,16 +24,22 @@ class RemoteMediator(
         state: PagingState<Int, PostEntity>
     ): MediatorResult {
         try {
+            delay(2000)
+
             val postsDao = localDatabase.postDao()
 
             val loadKey = when (loadType) {
-                LoadType.REFRESH -> 1
+                LoadType.REFRESH -> {
+                    Log.d("Pagination", "LoadType is Refresh")
+                    1
+                }
 
                 LoadType.PREPEND -> {
                     return MediatorResult.Success(endOfPaginationReached = true)
                 }
 
                 LoadType.APPEND -> {
+                    Log.d("Pagination", "LoadType is Append")
                     val lastItem = state.lastItemOrNull()
 
                     Log.d("Pagination", "lastItemId is: ${lastItem?.id}")
@@ -53,6 +60,10 @@ class RemoteMediator(
 
             Log.d("Pagination", "loadKey is: $loadKey")
 
+            delay(2000)
+
+            Log.d("Pagination", "loadKey is: $loadKey")
+
             val postsResponse = postApi.searchForPosts(
                 apiKey = "44587937-83eb06e8eec208ac26b62eff5",
                 query = "yellow+flowers",
@@ -60,19 +71,23 @@ class RemoteMediator(
                 perPage = state.config.pageSize
             )
 
+            Log.d("Pagination", "After Response")
+
+            delay(2000)
+
             localDatabase.withTransaction {
                 if (loadType == LoadType.REFRESH) {
                     localDatabase.postDao().clearPosts()
                 }
 
-                val postEntities = postsResponse.map {
+                val postEntities = postsResponse.posts.map {
                     it.toPostEntity()
                 }
 
                 localDatabase.postDao().upsertPosts(postEntities)
             }
 
-            return MediatorResult.Success(endOfPaginationReached = postsResponse.isEmpty())
+            return MediatorResult.Success(endOfPaginationReached = postsResponse.posts.isEmpty())
         } catch (ioException: IOException) {
             return MediatorResult.Error(ioException)
         } catch (httpException: HttpException) {

@@ -11,7 +11,7 @@ interface PostApi {
         @Query("image_type") imageType : String = "photo",
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
-    ) : List<PostDto>
+    ) : PostResponse
 
     companion object{
         const val BASE_URL = "https://pixabay.com/"
