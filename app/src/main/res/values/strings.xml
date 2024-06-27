@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">InfiniteListJetPack</string>
+    <string name="BAD_REQUEST">We coudn\'t handle this operation, Please try again.</string>
+    <string name="UNAUTHORIZED">You need to sign in first.</string>
+    <string name="INTERNET_NOT_AVAILABLE">Please check your internet connection.</string>
+    <string name="SERVER_NOT_AVAILABLE">Our servers are not available at the moment.</string>
+    <string name="TOO_MANY_REQUESTS">You have tried many times in short time.</string>
+    <string name="UNKNOWN_EXCEPTION">Something went wrong, Please try again.</string>
 </resources>

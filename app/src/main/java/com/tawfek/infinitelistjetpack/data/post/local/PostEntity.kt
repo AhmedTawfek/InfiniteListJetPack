@@ -3,10 +3,10 @@ package com.tawfek.infinitelistjetpack.data.post.local
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-
 @Entity
 data class PostEntity(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    val localId: Int,
     val id: Int,
     val tags: String,
     val imageUrl: String,

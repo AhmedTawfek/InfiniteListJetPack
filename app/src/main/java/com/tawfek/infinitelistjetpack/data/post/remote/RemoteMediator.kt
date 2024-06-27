@@ -60,10 +60,6 @@ class RemoteMediator(
 
             Log.d("Pagination", "loadKey is: $loadKey")
 
-            delay(2000)
-
-            Log.d("Pagination", "loadKey is: $loadKey")
-
             val postsResponse = postApi.searchForPosts(
                 apiKey = "44587937-83eb06e8eec208ac26b62eff5",
                 query = "yellow+flowers",
@@ -71,9 +67,7 @@ class RemoteMediator(
                 perPage = state.config.pageSize
             )
 
-            Log.d("Pagination", "After Response")
-
-            delay(2000)
+            Log.d("Pagination", "ResponseResult =$postsResponse")
 
             localDatabase.withTransaction {
                 if (loadType == LoadType.REFRESH) {
@@ -88,10 +82,10 @@ class RemoteMediator(
             }
 
             return MediatorResult.Success(endOfPaginationReached = postsResponse.posts.isEmpty())
-        } catch (ioException: IOException) {
-            return MediatorResult.Error(ioException)
-        } catch (httpException: HttpException) {
-            return MediatorResult.Error(httpException)
+
+        } catch (exception : Exception) {
+            Log.d("Pagination", "Exception In ResponseResult =${exception.message}")
+            return MediatorResult.Error(exception)
         }
     }
 }

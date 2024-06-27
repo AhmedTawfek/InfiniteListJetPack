@@ -49,7 +49,7 @@ object AppModule{
     @Singleton
     fun providePager(localDatabase: LocalDatabase, postsApi: PostApi): Pager<Int, PostEntity> {
         return Pager(
-            config = PagingConfig(pageSize = 10),
+            config = PagingConfig(pageSize = 20, prefetchDistance = 1, initialLoadSize = 1),
             remoteMediator = RemoteMediator(
                 localDatabase = localDatabase,
                 postApi = postsApi

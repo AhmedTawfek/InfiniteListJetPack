@@ -29,6 +29,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
@@ -81,6 +82,7 @@ dependencies {
 
     // Compose Navigation
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.compose.animation)
 
     // Retrofit
     implementation(libs.retrofit)

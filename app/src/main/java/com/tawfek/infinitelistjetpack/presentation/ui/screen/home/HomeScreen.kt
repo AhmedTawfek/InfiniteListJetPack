@@ -1,9 +1,17 @@
+@file:OptIn(ExperimentalSharedTransitionApi::class)
+
 package com.tawfek.infinitelistjetpack.presentation.ui.screen.home
 
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +24,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -39,19 +48,25 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.tawfek.infinitelistjetpack.R
+import com.tawfek.infinitelistjetpack.data.mappers.getErrorType
 import com.tawfek.infinitelistjetpack.domain.post.model.Post
+import com.tawfek.infinitelistjetpack.presentation.ui.AppEntry
 import com.tawfek.infinitelistjetpack.presentation.ui.common.IconWithText
 import com.tawfek.infinitelistjetpack.presentation.ui.theme.InfiniteListJetPackTheme
+import com.tawfek.infinitelistjetpack.presentation.ui.utils.convertErrorTypeToMessage
 
 @Composable
-fun HomeScreen(posts: LazyPagingItems<Post>) {
+fun SharedTransitionScope.HomeScreen(posts: LazyPagingItems<Post>, animatedVisibilityScope: AnimatedVisibilityScope, onItemClick : (Post) -> Unit) {
 
     val context = LocalContext.current
+
     LaunchedEffect(key1 = posts.loadState) {
         if (posts.loadState.refresh is LoadState.Error) {
+            val errorType = ((posts.loadState.refresh as LoadState.Error).error as Exception).getErrorType()
+
             Toast.makeText(
                 context,
-                "Error: " + (posts.loadState.refresh as LoadState.Error).error.message,
+                errorType.convertErrorTypeToMessage(context),
                 Toast.LENGTH_LONG
             ).show()
         }
@@ -64,14 +79,21 @@ fun HomeScreen(posts: LazyPagingItems<Post>) {
                 modifier = Modifier.align(Alignment.Center)
             )
         } else {
+
+            val listState = rememberLazyListState()
+
             LazyColumn(
+                state = listState,
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
-                Log.d("Pagination","postsCount = ${posts.itemCount}")
+
                 items(posts.itemCount) { post ->
-                    posts[post]?.let { PostCard(post = it) }
+                    posts[post]?.let { PostCard(post = it,animatedVisibilityScope){post ->
+                        onItemClick(post)
+                    } }
                 }
+
                 item {
                     if (posts.loadState.append is LoadState.Loading) {
                         CircularProgressIndicator()
@@ -83,21 +105,30 @@ fun HomeScreen(posts: LazyPagingItems<Post>) {
 }
 
 @Composable
-fun PostCard(post: Post) {
+fun SharedTransitionScope.PostCard(post: Post,animatedVisibilityScope: AnimatedVisibilityScope,onItemClick: (Post) -> Unit) {
     Column(modifier = Modifier
         .fillMaxWidth()
-        .padding(16.dp)) {
+        .padding(16.dp)
+        .clickable { onItemClick(post) }) {
         Row(modifier = Modifier.fillMaxWidth()) {
 
             AsyncImage(
                 model = post.userImageURL, contentDescription = null, modifier = Modifier
-                    .clip(CircleShape)
-                    .size(40.dp),
+                    .size(40.dp)
+                    .border(width = 0.dp, color = Color.White, shape = CircleShape)
+                    .sharedElement(
+                        state = rememberSharedContentState(key = post.userImageURL),
+                        animatedVisibilityScope = animatedVisibilityScope,
+                        boundsTransform = { _, _ ->
+                            tween(durationMillis = 1000)
+                        }
+                    )
+                    .border(width = 2.dp, color = Color.White, shape = CircleShape)
+                    .clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.profile_icon),
                 error = painterResource(id = R.drawable.profile_icon)
             )
-
             Spacer(modifier = Modifier.width(5.dp))
             Text(text = post.userName, modifier = Modifier.align(Alignment.CenterVertically))
         }
@@ -107,10 +138,16 @@ fun PostCard(post: Post) {
         AsyncImage(
             model = post.imageUrl, contentDescription = null, modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp)
-                .clip(
-                    RoundedCornerShape(10.dp)
-                ), contentScale = ContentScale.FillBounds, placeholder = painterResource(id = R.drawable.pixeled_background), error = painterResource(
+                .height(140.dp)
+                .sharedElement(
+                    state = rememberSharedContentState(key = post.imageUrl),
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    boundsTransform = { _, _ ->
+                        tween(durationMillis = 1000)
+                    }
+                )
+                .clip(RoundedCornerShape(10.dp))
+            , contentScale = ContentScale.FillBounds, placeholder = painterResource(id = R.drawable.pixeled_background), error = painterResource(
                 id = R.drawable.pixeled_background
             )
         )
@@ -128,7 +165,7 @@ fun PostCard(post: Post) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .height(2.dp)
-        .background(Color.LightGray)) {
+        .background(Color(0xFFF6F6F6))) {
     }
 }
 
@@ -141,8 +178,6 @@ private fun HomeScreenPrev() {
             modifier = Modifier.fillMaxSize(),
             color = Color.White
         ) {
-            PostCard(post = Post(1,"","",100,100,100,100,100,"Ahmed Tawfek",""))
-            PostCard(post = Post(1,"","",100,100,100,100,100,"Ahmed Tawfek",""))
         }
     }
 
