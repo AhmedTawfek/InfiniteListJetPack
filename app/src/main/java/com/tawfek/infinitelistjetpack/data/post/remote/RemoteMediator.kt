@@ -24,10 +24,9 @@ class RemoteMediator(
         state: PagingState<Int, PostEntity>
     ): MediatorResult {
         try {
-            delay(2000)
+            delay(500)
 
             val postsDao = localDatabase.postDao()
-
             val loadKey = when (loadType) {
                 LoadType.REFRESH -> {
                     Log.d("Pagination", "LoadType is Refresh")
@@ -35,6 +34,7 @@ class RemoteMediator(
                 }
 
                 LoadType.PREPEND -> {
+                    Log.d("Pagination", "LoadType is Prepend")
                     return MediatorResult.Success(endOfPaginationReached = true)
                 }
 
@@ -42,18 +42,15 @@ class RemoteMediator(
                     Log.d("Pagination", "LoadType is Append")
                     val lastItem = state.lastItemOrNull()
 
-                    Log.d("Pagination", "lastItemId is: ${lastItem?.id}")
-
                     if (lastItem == null) {
+                        Log.d("Pagination", "No items found. Setting loadKey to 1.")
                         1
-                    }else{
+                    } else {
                         val totalPostsCountExistsLocally = postsDao.getPostsCount()
-
-                        if(totalPostsCountExistsLocally == 0) {
-                            1
-                        }else{
-                            (totalPostsCountExistsLocally / state.config.pageSize) + 1
-                        }
+                        Log.d("Pagination", "Total posts count locally: $totalPostsCountExistsLocally")
+                        val loadKey = (totalPostsCountExistsLocally / state.config.pageSize) + 1
+                        Log.d("Pagination", "Computed loadKey: $loadKey")
+                        loadKey
                     }
                 }
             }
@@ -67,22 +64,18 @@ class RemoteMediator(
                 perPage = state.config.pageSize
             )
 
-            Log.d("Pagination", "ResponseResult =$postsResponse")
+            Log.d("Pagination", "ResponseResult = $postsResponse")
 
             localDatabase.withTransaction {
                 if (loadType == LoadType.REFRESH) {
                     localDatabase.postDao().clearPosts()
                 }
 
-                val postEntities = postsResponse.posts.map {
-                    it.toPostEntity()
-                }
-
+                val postEntities = postsResponse.posts.map { it.toPostEntity() }
                 localDatabase.postDao().upsertPosts(postEntities)
             }
 
             return MediatorResult.Success(endOfPaginationReached = postsResponse.posts.isEmpty())
-
         } catch (exception : Exception) {
             Log.d("Pagination", "Exception In ResponseResult =${exception.message}")
             return MediatorResult.Error(exception)

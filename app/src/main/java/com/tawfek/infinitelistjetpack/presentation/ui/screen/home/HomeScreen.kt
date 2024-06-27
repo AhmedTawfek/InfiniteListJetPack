@@ -41,12 +41,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.tawfek.infinitelistjetpack.R
 import com.tawfek.infinitelistjetpack.data.mappers.getErrorType
 import com.tawfek.infinitelistjetpack.domain.post.model.Post
@@ -88,10 +91,12 @@ fun SharedTransitionScope.HomeScreen(posts: LazyPagingItems<Post>, animatedVisib
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
 
-                items(posts.itemCount) { post ->
-                    posts[post]?.let { PostCard(post = it,animatedVisibilityScope){post ->
-                        onItemClick(post)
-                    } }
+                items(posts){postItem ->
+                    if (postItem!=null){
+                        PostCard(post = postItem,animatedVisibilityScope){post ->
+                            onItemClick(post)
+                        }
+                    }
                 }
 
                 item {
@@ -114,8 +119,6 @@ fun SharedTransitionScope.PostCard(post: Post,animatedVisibilityScope: AnimatedV
 
             AsyncImage(
                 model = post.userImageURL, contentDescription = null, modifier = Modifier
-                    .size(40.dp)
-                    .border(width = 0.dp, color = Color.White, shape = CircleShape)
                     .sharedElement(
                         state = rememberSharedContentState(key = post.userImageURL),
                         animatedVisibilityScope = animatedVisibilityScope,
@@ -123,7 +126,7 @@ fun SharedTransitionScope.PostCard(post: Post,animatedVisibilityScope: AnimatedV
                             tween(durationMillis = 1000)
                         }
                     )
-                    .border(width = 2.dp, color = Color.White, shape = CircleShape)
+                    .size(40.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 placeholder = painterResource(id = R.drawable.profile_icon),
@@ -136,9 +139,12 @@ fun SharedTransitionScope.PostCard(post: Post,animatedVisibilityScope: AnimatedV
         Spacer(modifier = Modifier.height(10.dp))
 
         AsyncImage(
-            model = post.imageUrl, contentDescription = null, modifier = Modifier
-                .fillMaxWidth()
-                .height(140.dp)
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(post.imageUrl)
+                .crossfade(false)
+                .placeholderMemoryCacheKey(post.imageUrl) //  same key as shared element key
+                .memoryCacheKey(post.imageUrl) // same key as shared element key
+                .build(), contentDescription = null, modifier = Modifier
                 .sharedElement(
                     state = rememberSharedContentState(key = post.imageUrl),
                     animatedVisibilityScope = animatedVisibilityScope,
@@ -146,6 +152,8 @@ fun SharedTransitionScope.PostCard(post: Post,animatedVisibilityScope: AnimatedV
                         tween(durationMillis = 1000)
                     }
                 )
+                .fillMaxWidth()
+                .height(140.dp)
                 .clip(RoundedCornerShape(10.dp))
             , contentScale = ContentScale.FillBounds, placeholder = painterResource(id = R.drawable.pixeled_background), error = painterResource(
                 id = R.drawable.pixeled_background
