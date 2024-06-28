@@ -16,5 +16,4 @@ class AppEntry : Application(), ImageLoaderFactory {
             .respectCacheHeaders(false)
             .build()
     }
-
 }

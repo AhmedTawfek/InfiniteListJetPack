@@ -24,7 +24,7 @@ class RemoteMediator(
         state: PagingState<Int, PostEntity>
     ): MediatorResult {
         try {
-            delay(500)
+            delay(500) // For better UX experience, for testing purposes only.
 
             val postsDao = localDatabase.postDao()
             val loadKey = when (loadType) {
@@ -58,7 +58,7 @@ class RemoteMediator(
             Log.d("Pagination", "loadKey is: $loadKey")
 
             val postsResponse = postApi.searchForPosts(
-                apiKey = "44587937-83eb06e8eec208ac26b62eff5",
+                apiKey = PostApi.API_KEY,
                 query = "yellow+flowers",
                 page = loadKey,
                 perPage = state.config.pageSize

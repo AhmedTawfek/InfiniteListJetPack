@@ -1,5 +1,6 @@
 package com.tawfek.infinitelistjetpack.data.post.remote
 
+import com.tawfek.infinitelistjetpack.BuildConfig
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -15,5 +16,6 @@ interface PostApi {
 
     companion object{
         const val BASE_URL = "https://pixabay.com/"
+        const val API_KEY = BuildConfig.API_KEY
     }
 }
