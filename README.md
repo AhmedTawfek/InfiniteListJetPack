@@ -1,6 +1,9 @@
 # Jetpack Compose - Infinite List 
 This two-screen app demonstrates the use of the Pagination 3 library, combined with Compose Shared Element Transitions.
 
+# Video
+<video src='https://www.youtube.com/shorts/hGOHmDX1ipY' width=180/>
+
 # Components
 - Jetpack Compose: For declarative UI
 - Shared Element Transition Animation: For smooth transitions between shared elements
