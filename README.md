@@ -12,7 +12,7 @@ This two-screen app demonstrates the use of the Pagination 3 library, combined w
 - [PixaBay - API](https://pixabay.com/api/docs/)
 
 # Video
-<video src="https://github.com/AhmedTawfek/InfiniteListJetPack/assets/95584517/1b12f78a-70bf-4f4b-9bd2-254867666b74"></video>
+<video src="https://github.com/AhmedTawfek/InfiniteListJetPack/assets/95584517/7056e6ed-f962-4855-98aa-ae024f1894e7"></video>
 
 # Setup
 1. Create a file named api_key.properties
