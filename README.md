@@ -9,6 +9,7 @@ This two-screen app demonstrates the use of the Pagination 3 library, combined w
 - Room: For local data caching
 - Coil: For efficient image loading and caching
 - Dagger-Hilt: For dependency-injection.
+- [PixaBay - API](https://pixabay.com/api/docs/)
 
 # Setup
 1. Create a file named api_key.properties
